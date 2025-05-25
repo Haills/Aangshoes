@@ -25,13 +25,13 @@ use App\Http\Controllers\{
 */
 
 Route::middleware('guest')->group(function () {
-    // Rute Login
+    // Login
     Route::controller(LoginController::class)->group(function () {
         Route::get('login', 'showLoginForm')->name('login');
         Route::post('login', 'login');
     });
 
-    // Rute Registrasi
+    // Registrasi
     Route::controller(RegisterController::class)->group(function () {
         Route::get('register', 'showRegistrationForm')->name('register');
         Route::post('register', 'register');
@@ -49,12 +49,12 @@ Route::middleware('guest')->group(function () {
     });
 });
 
+// Tentang Kami
+Route::view('/tentang-kami', 'about')->name('about');
 
+// Produk detail bisa diakses publik tanpa login
+Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
 
-// Route untuk halaman "Tentang Kami"
-Route::get('/tentang-kami', function () {
-    return view('about'); // Pastikan file `resources/views/about.blade.php` ada
-})->name('about'); // Beri nama route 'about'
 
 /* 
 |--------------------------------------------------------------------------
@@ -79,21 +79,22 @@ Route::middleware('auth')->group(function () {
             : redirect()->route('home');
     });
 
-    // Dashboard Pelanggan
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    // Dashboard User Biasa
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-     // Profile Routes
+    // Profile
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
     });
 
-    // Order History
+    // Order History untuk semua user
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
     /* 
     |--------------------------------------------------------------------------
-    | RUTE KHUSUS ADMIN
+    | RUTE KHUSUS ADMIN (prefix admin + middleware admin)
     |--------------------------------------------------------------------------
     */
     Route::prefix('admin')->middleware('admin')->group(function () {
@@ -103,8 +104,9 @@ Route::middleware('auth')->group(function () {
         // Manajemen Kategori
         Route::resource('categories', CategoryController::class)->except(['show']);
 
-        // Manajemen Produk
-        Route::resource('products', ProductController::class);
+        // Manajemen Produk (admin bisa CRUD)
+        Route::resource('products', ProductController::class)->except(['show']); // show di public route
+
         Route::delete('products/{product}/images/{image}', [ProductImageController::class, 'destroy'])
             ->name('product-images.destroy');
 

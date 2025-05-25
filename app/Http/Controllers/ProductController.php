@@ -17,7 +17,11 @@ class ProductController extends Controller
             'products' => Product::with('category')->latest()->paginate(10)
         ]);
     }
-
+    public function publicIndex()
+    {
+        $products = Product::with('category')->latest()->paginate(12);
+        return view('products.public', compact('products'));
+    }
     public function create()
     {
         return view('products.create', [
@@ -62,7 +66,7 @@ class ProductController extends Controller
     {
         $this->deleteProductImages($product);
         $product->delete();
-        
+
         return redirect()->route('products.index')->with('success', 'Product deleted successfully');
     }
 

@@ -1,40 +1,44 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') | Aangshoes</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" href="{{ asset('images/favicon.ico') }}">
-    
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Vite CSS & JS (untuk Laravel) -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
-    @stack('styles')
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@yield('title') - Aangshoes</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-    @include('layouts.navbar')
-    
-    <main class="flex-grow-1 py-4">
-        <div class="container">
-            @include('components.alert')
-            @yield('content')
-        </div>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+    <header class="bg-white shadow p-4 flex justify-between items-center">
+        <a href="{{ url('/') }}" class="text-xl font-bold text-green-700">Aangshoes</a>
+        <nav>
+            <ul class="flex space-x-4 items-center">
+                <li><a href="{{ url('/') }}" class="hover:text-green-700">Home</a></li>
+
+                @auth
+                    @if(auth()->user()->is_admin)
+                        <li><a href="{{ route('products.index') }}" class="hover:text-green-700">Kelola Produk</a></li>
+                    @endif
+                    <li>
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="hover:text-green-700">Logout</button>
+                        </form>
+                    </li>
+                @else
+                    <li><a href="{{ route('login') }}" class="hover:text-green-700">Login</a></li>
+                    <li><a href="{{ route('register') }}" class="hover:text-green-700">Register</a></li>
+                @endauth
+            </ul>
+        </nav>
+    </header>
+
+    <main class="flex-grow container mx-auto p-6">
+        @yield('content')
     </main>
-    
-    @include('layouts.footer')
-    
-    @include('partials.scripts')
-    @stack('scripts')
+
+    <footer class="bg-white text-center p-4 shadow">
+        &copy; {{ date('Y') }} Aangshoes. All rights reserved.
+    </footer>
+
 </body>
 </html>
